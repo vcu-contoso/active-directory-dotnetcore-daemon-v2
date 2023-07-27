@@ -21,9 +21,9 @@ tokenAcquirerFactory.Services.AddLogging(
 // Create a downstream API service named 'MyApi' which comes loaded with several
 // utility methods to make HTTP calls to the DownstreamApi configurations found
 // in the "MyWebApi" section of your appsettings.json file.
-tokenAcquirerFactory.Services.AddDownstreamApi("MyApi",
-    tokenAcquirerFactory.Configuration.GetSection("MyWebApi"));
-var sp = tokenAcquirerFactory.Build();
+tokenAcquirerFactory.Services
+    .AddDownstreamApi("MyApi", tokenAcquirerFactory.Configuration.GetSection("MyWebApi"))
+    .AddDownstreamApi("MyOtherApi", tokenAcquirerFactory.Configuration.GetSection("MyOtherWebApi"));
 
 // Extract the downstream API service from the 'tokenAcquirerFactory' service provider.
 var api = sp.GetRequiredService<IDownstreamApi>();
@@ -31,5 +31,7 @@ var api = sp.GetRequiredService<IDownstreamApi>();
 // You can use the API service to make direct HTTP calls to your API. Token
 // acquisition is handled automatically based on the configurations in your
 // appsettings.json file.
-var result = await api.GetForAppAsync<IEnumerable<TodoItem>>("MyApi");
+var resultMyApi = await api.GetForAppAsync<IEnumerable<TodoItem>>("MyApi");
+var resultMyOtherApi = await api.GetForAppAsync<IEnumerable<TodoItem>>("MyOtherApi");
+
 Console.WriteLine($"result = {result?.Count()}");
